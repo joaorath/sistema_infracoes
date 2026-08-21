@@ -1,13 +1,10 @@
 package com.transito.sistema.controller;
 
-import com.transito.sistema.entity.Condutor;
+import com.transito.sistema.dto.CondutorRequest;
+import com.transito.sistema.dto.CondutorResponse;
 import com.transito.sistema.service.CondutorService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,12 +19,14 @@ public class CondutorController {
     }
 
     @GetMapping
-    public List<Condutor> listarTodos() {
+    public List<CondutorResponse> listarTodos() {
         return condutorService.listarTodos();
     }
 
     @PostMapping
-    public Condutor salvar(@Valid @RequestBody Condutor condutor) {
-        return condutorService.salvar(condutor);
+    public CondutorResponse salvar(
+            @Valid @RequestBody CondutorRequest request) {
+
+        return condutorService.salvar(request);
     }
 }

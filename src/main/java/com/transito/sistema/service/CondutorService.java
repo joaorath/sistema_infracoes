@@ -3,7 +3,8 @@ package com.transito.sistema.service;
 import com.transito.sistema.entity.Condutor;
 import com.transito.sistema.repository.CondutorRepository;
 import org.springframework.stereotype.Service;
-
+import com.transito.sistema.dto.CondutorRequest;
+import com.transito.sistema.dto.CondutorResponse;
 import java.util.List;
 
 @Service
@@ -15,11 +16,37 @@ public class CondutorService {
         this.condutorRepository = condutorRepository;
     }
 
-    public List<Condutor> listarTodos() {
-        return condutorRepository.findAll();
-    }
+    public List<CondutorResponse> listarTodos() {
 
-    public Condutor salvar(Condutor condutor) {
-        return condutorRepository.save(condutor);
-    }
+    return condutorRepository.findAll()
+            .stream()
+            .map(condutor -> new CondutorResponse(
+                    condutor.getId(),
+                    condutor.getNome(),
+                    condutor.getCpf(),
+                    condutor.getNumeroCnh(),
+                    condutor.getPontuacaoCnh()
+            ))
+            .toList();
+}
+
+    public CondutorResponse salvar(CondutorRequest request) {
+
+    Condutor condutor = new Condutor();
+
+    condutor.setNome(request.getNome());
+    condutor.setCpf(request.getCpf());
+    condutor.setNumeroCnh(request.getNumeroCnh());
+    condutor.setPontuacaoCnh(0);
+
+    Condutor salvo = condutorRepository.save(condutor);
+
+    return new CondutorResponse(
+            salvo.getId(),
+            salvo.getNome(),
+            salvo.getCpf(),
+            salvo.getNumeroCnh(),
+            salvo.getPontuacaoCnh()
+    );
+}
 }
