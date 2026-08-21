@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class CondutorController {
     }
 
     @PostMapping
-    public Condutor salvar(@RequestBody Condutor condutor) {
+    public Condutor salvar(@Valid @RequestBody Condutor condutor) {
         return condutorService.salvar(condutor);
     }
 }
