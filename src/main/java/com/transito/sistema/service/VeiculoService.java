@@ -52,6 +52,12 @@ public class VeiculoService {
                 .toList();
     }
 
+    public Veiculo buscarPorId(Long id) {
+    return veiculoRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Veículo não encontrado"));
+    }
+
     private VeiculoResponse converterParaResponse(Veiculo veiculo) {
 
         return new VeiculoResponse(

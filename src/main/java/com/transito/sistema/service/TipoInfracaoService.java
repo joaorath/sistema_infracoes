@@ -3,6 +3,7 @@ package com.transito.sistema.service;
 import com.transito.sistema.dto.TipoInfracaoRequest;
 import com.transito.sistema.dto.TipoInfracaoResponse;
 import com.transito.sistema.entity.TipoInfracao;
+import com.transito.sistema.exception.ResourceNotFoundException;
 import com.transito.sistema.repository.TipoInfracaoRepository;
 import org.springframework.stereotype.Service;
 
@@ -57,5 +58,12 @@ public class TipoInfracaoService {
                 tipoInfracao.getPontos(),
                 tipoInfracao.getValor()
         );
+    }
+
+    public TipoInfracao buscarPorId(Long id) {
+        return tipoInfracaoRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Tipo de infração não encontrado"));
     }
 }

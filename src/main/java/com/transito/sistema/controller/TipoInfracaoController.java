@@ -2,6 +2,7 @@ package com.transito.sistema.controller;
 
 import com.transito.sistema.dto.TipoInfracaoRequest;
 import com.transito.sistema.dto.TipoInfracaoResponse;
+import com.transito.sistema.entity.TipoInfracao;
 import com.transito.sistema.service.TipoInfracaoService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,11 @@ public class TipoInfracaoController {
     @GetMapping
     public List<TipoInfracaoResponse> listarTodos() {
         return tipoInfracaoService.listarTodos();
+    }
+
+    @GetMapping("/{id}")
+    public TipoInfracao buscarPorId(@PathVariable Long id) {
+        return tipoInfracaoService.buscarPorId(id);
     }
 
     @PostMapping

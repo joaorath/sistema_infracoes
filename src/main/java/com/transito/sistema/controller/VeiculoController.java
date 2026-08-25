@@ -2,6 +2,7 @@ package com.transito.sistema.controller;
 
 import com.transito.sistema.dto.VeiculoRequest;
 import com.transito.sistema.dto.VeiculoResponse;
+import com.transito.sistema.entity.Veiculo;
 import com.transito.sistema.service.VeiculoService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,11 @@ public class VeiculoController {
     @GetMapping
     public List<VeiculoResponse> listarTodos() {
         return veiculoService.listarTodos();
+    }
+    
+    @GetMapping("/{id}")
+    public Veiculo buscarPorId(@PathVariable Long id) {
+        return veiculoService.buscarPorId(id);
     }
 
     @PostMapping
