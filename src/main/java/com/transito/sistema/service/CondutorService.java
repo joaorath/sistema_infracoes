@@ -1,6 +1,7 @@
 package com.transito.sistema.service;
 
 import com.transito.sistema.entity.Condutor;
+import com.transito.sistema.exception.ResourceNotFoundException;
 import com.transito.sistema.repository.CondutorRepository;
 import org.springframework.stereotype.Service;
 import com.transito.sistema.dto.CondutorRequest;
@@ -28,7 +29,12 @@ public class CondutorService {
                     condutor.getPontuacaoCnh()
             ))
             .toList();
-}
+    }
+    public Condutor buscarPorId(Long id) {
+    return condutorRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Condutor não encontrado"));
+    }
 
     public CondutorResponse salvar(CondutorRequest request) {
 
