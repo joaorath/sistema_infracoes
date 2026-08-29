@@ -6,6 +6,8 @@ import com.transito.sistema.entity.Condutor;
 import com.transito.sistema.service.CondutorService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
@@ -34,5 +36,13 @@ public class CondutorController {
             @Valid @RequestBody CondutorRequest request) {
 
         return condutorService.salvar(request);
+    }
+
+    @PutMapping("/{id}")
+    public CondutorResponse atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody CondutorRequest request) {
+
+        return condutorService.atualizar(id, request);
     }
 }

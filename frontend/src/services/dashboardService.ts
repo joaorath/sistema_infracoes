@@ -1,6 +1,13 @@
 import { api } from "./api";
 
-export async function buscarResumoDashboard() {
+export interface DashboardResumo {
+    condutores: number;
+    veiculos: number;
+    tiposInfracao: number;
+    infracoes: number;
+}
+
+export async function buscarResumoDashboard(): Promise<DashboardResumo> {
     const [condutores, veiculos, tiposInfracao, infracoes] =
         await Promise.all([
             api.get("/condutores"),
@@ -10,9 +17,9 @@ export async function buscarResumoDashboard() {
         ]);
 
     return {
-        totalCondutores: condutores.data.length,
-        totalVeiculos: veiculos.data.length,
-        totalTiposInfracao: tiposInfracao.data.length,
-        totalInfracoes: infracoes.data.length,
+        condutores: condutores.data.length,
+        veiculos: veiculos.data.length,
+        tiposInfracao: tiposInfracao.data.length,
+        infracoes: infracoes.data.length,
     };
 }

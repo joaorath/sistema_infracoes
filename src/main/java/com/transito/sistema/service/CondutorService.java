@@ -17,6 +17,17 @@ public class CondutorService {
         this.condutorRepository = condutorRepository;
     }
 
+    private CondutorResponse converterParaResponse(Condutor condutor) {
+
+    return new CondutorResponse(
+            condutor.getId(),
+            condutor.getNome(),
+            condutor.getCpf(),
+            condutor.getNumeroCnh(),
+            condutor.getPontuacaoCnh()
+    );
+    }
+
     public List<CondutorResponse> listarTodos() {
 
     return condutorRepository.findAll()
@@ -54,5 +65,21 @@ public class CondutorService {
             salvo.getNumeroCnh(),
             salvo.getPontuacaoCnh()
     );
-}
+    }
+
+    public CondutorResponse atualizar(Long id, CondutorRequest request) {
+
+    Condutor condutor = condutorRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException(
+                            "Condutor não encontrado"));
+
+    condutor.setNome(request.getNome());
+    condutor.setCpf(request.getCpf());
+    condutor.setNumeroCnh(request.getNumeroCnh());
+
+    Condutor atualizado = condutorRepository.save(condutor);
+
+    return converterParaResponse(atualizado);
+    }
 }
