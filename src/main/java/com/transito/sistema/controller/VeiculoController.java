@@ -23,7 +23,7 @@ public class VeiculoController {
     public List<VeiculoResponse> listarTodos() {
         return veiculoService.listarTodos();
     }
-    
+
     @GetMapping("/{id}")
     public Veiculo buscarPorId(@PathVariable Long id) {
         return veiculoService.buscarPorId(id);
@@ -34,5 +34,18 @@ public class VeiculoController {
             @Valid @RequestBody VeiculoRequest request) {
 
         return veiculoService.salvar(request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void excluir(@PathVariable Long id) {
+        veiculoService.excluir(id);
+    }
+
+    @PutMapping("/{id}")
+    public VeiculoResponse atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody VeiculoRequest request) {
+
+        return veiculoService.atualizar(id, request);
     }
 }
