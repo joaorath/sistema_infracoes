@@ -23,24 +23,46 @@ public class InfracaoController {
         return infracaoService.listarTodos();
     }
 
+    @GetMapping("/{id}")
+    public InfracaoResponse buscarPorId(
+            @PathVariable Long id
+    ) {
+        return infracaoService.buscarPorId(id);
+    }
+
     @GetMapping("/condutor/{condutorId}")
     public List<InfracaoResponse> listarPorCondutor(
-        @PathVariable Long condutorId) {
-
+            @PathVariable Long condutorId
+    ) {
         return infracaoService.listarPorCondutor(condutorId);
     }
 
     @GetMapping("/veiculo/{veiculoId}")
     public List<InfracaoResponse> listarPorVeiculo(
-        @PathVariable Long veiculoId) {
-
+            @PathVariable Long veiculoId
+    ) {
         return infracaoService.listarPorVeiculo(veiculoId);
     }
 
     @PostMapping
     public InfracaoResponse salvar(
-            @Valid @RequestBody InfracaoRequest request) {
-
+            @Valid @RequestBody InfracaoRequest request
+    ) {
         return infracaoService.salvar(request);
+    }
+
+    @PutMapping("/{id}")
+    public InfracaoResponse atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody InfracaoRequest request
+    ) {
+        return infracaoService.atualizar(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void excluir(
+            @PathVariable Long id
+    ) {
+        infracaoService.excluir(id);
     }
 }

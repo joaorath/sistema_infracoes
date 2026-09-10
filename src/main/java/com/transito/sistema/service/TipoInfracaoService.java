@@ -16,7 +16,6 @@ public class TipoInfracaoService {
 
     public TipoInfracaoService(
             TipoInfracaoRepository tipoInfracaoRepository) {
-
         this.tipoInfracaoRepository = tipoInfracaoRepository;
     }
 
@@ -27,11 +26,7 @@ public class TipoInfracaoService {
         tipoInfracao.setCodigo(request.getCodigo());
         tipoInfracao.setDescricao(request.getDescricao());
         tipoInfracao.setGravidade(request.getGravidade());
-
-        // Regra de negócio:
-        // os pontos são definidos automaticamente pela gravidade.
-        tipoInfracao.setPontos(request.getGravidade().getPontos());
-
+        tipoInfracao.setPontos(request.getPontos());
         tipoInfracao.setValor(request.getValor());
 
         TipoInfracao salvo = tipoInfracaoRepository.save(tipoInfracao);
@@ -47,6 +42,49 @@ public class TipoInfracaoService {
                 .toList();
     }
 
+    public TipoInfracao buscarPorId(Long id) {
+
+        return tipoInfracaoRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Tipo de infração não encontrado"
+                        ));
+    }
+
+    public TipoInfracaoResponse atualizar(
+            Long id,
+            TipoInfracaoRequest request) {
+
+        TipoInfracao tipoInfracao = tipoInfracaoRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Tipo de infração não encontrado"
+                        ));
+
+        tipoInfracao.setCodigo(request.getCodigo());
+        tipoInfracao.setDescricao(request.getDescricao());
+        tipoInfracao.setGravidade(request.getGravidade());
+        tipoInfracao.setPontos(request.getPontos());
+        tipoInfracao.setValor(request.getValor());
+
+        TipoInfracao atualizado =
+                tipoInfracaoRepository.save(tipoInfracao);
+
+        return converterParaResponse(atualizado);
+    }
+
+    public void excluir(Long id) {
+
+        TipoInfracao tipoInfracao =
+                tipoInfracaoRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Tipo de infração não encontrado"
+                                ));
+
+        tipoInfracaoRepository.delete(tipoInfracao);
+    }
+
     private TipoInfracaoResponse converterParaResponse(
             TipoInfracao tipoInfracao) {
 
@@ -58,12 +96,5 @@ public class TipoInfracaoService {
                 tipoInfracao.getPontos(),
                 tipoInfracao.getValor()
         );
-    }
-
-    public TipoInfracao buscarPorId(Long id) {
-        return tipoInfracaoRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Tipo de infração não encontrado"));
     }
 }

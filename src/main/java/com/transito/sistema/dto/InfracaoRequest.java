@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 
 public class InfracaoRequest {
 
-    @NotNull(message = "O veículo é obrigatório")
-    private Long veiculoId;
-
     @NotNull(message = "O condutor é obrigatório")
     private Long condutorId;
+
+    @NotNull(message = "O veículo é obrigatório")
+    private Long veiculoId;
 
     @NotNull(message = "O tipo de infração é obrigatório")
     private Long tipoInfracaoId;
@@ -21,20 +21,20 @@ public class InfracaoRequest {
     public InfracaoRequest() {
     }
 
-    public Long getVeiculoId() {
-        return veiculoId;
-    }
-
-    public void setVeiculoId(Long veiculoId) {
-        this.veiculoId = veiculoId;
-    }
-
     public Long getCondutorId() {
         return condutorId;
     }
 
     public void setCondutorId(Long condutorId) {
         this.condutorId = condutorId;
+    }
+
+    public Long getVeiculoId() {
+        return veiculoId;
+    }
+
+    public void setVeiculoId(Long veiculoId) {
+        this.veiculoId = veiculoId;
     }
 
     public Long getTipoInfracaoId() {

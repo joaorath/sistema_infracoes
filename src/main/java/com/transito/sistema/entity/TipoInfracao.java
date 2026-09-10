@@ -25,7 +25,7 @@ public class TipoInfracao {
     @Column(nullable = false)
     private Integer pontos;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
 
     public TipoInfracao() {

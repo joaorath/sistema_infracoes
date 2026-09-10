@@ -36,4 +36,17 @@ public class TipoInfracaoController {
 
         return tipoInfracaoService.salvar(request);
     }
+
+    @PutMapping("/{id}")
+    public TipoInfracaoResponse atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody TipoInfracaoRequest request) {
+
+        return tipoInfracaoService.atualizar(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void excluir(@PathVariable Long id) {
+        tipoInfracaoService.excluir(id);
+    }
 }

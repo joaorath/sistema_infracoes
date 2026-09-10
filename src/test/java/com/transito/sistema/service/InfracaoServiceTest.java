@@ -58,6 +58,7 @@ class InfracaoServiceTest {
         condutor.setPontuacaoCnh(0);
 
         Veiculo veiculo = new Veiculo();
+        veiculo.setCondutor(condutor);
 
         TipoInfracao tipoInfracao = new TipoInfracao();
         tipoInfracao.setCodigo("001");
@@ -213,6 +214,7 @@ class InfracaoServiceTest {
         condutor.setPontuacaoCnh(7);
 
         Veiculo veiculo = new Veiculo();
+        veiculo.setCondutor(condutor);
 
         TipoInfracao tipoInfracao = new TipoInfracao();
         tipoInfracao.setCodigo("002");

@@ -1,5 +1,7 @@
 package com.transito.sistema.dto;
 
+import com.transito.sistema.enums.GravidadeInfracao;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -7,42 +9,50 @@ public class InfracaoResponse {
 
     private Long id;
 
-    private Long veiculoId;
-    private String placa;
-
     private Long condutorId;
     private String nomeCondutor;
+
+    private Long veiculoId;
+    private String placaVeiculo;
 
     private Long tipoInfracaoId;
     private String codigoInfracao;
     private String descricaoInfracao;
 
+    private GravidadeInfracao gravidade;
+
     private Integer pontos;
+
     private BigDecimal valor;
 
     private LocalDateTime dataHora;
 
+    public InfracaoResponse() {
+    }
+
     public InfracaoResponse(
             Long id,
-            Long veiculoId,
-            String placa,
             Long condutorId,
             String nomeCondutor,
+            Long veiculoId,
+            String placaVeiculo,
             Long tipoInfracaoId,
             String codigoInfracao,
             String descricaoInfracao,
+            GravidadeInfracao gravidade,
             Integer pontos,
             BigDecimal valor,
-            LocalDateTime dataHora) {
-
+            LocalDateTime dataHora
+    ) {
         this.id = id;
-        this.veiculoId = veiculoId;
-        this.placa = placa;
         this.condutorId = condutorId;
         this.nomeCondutor = nomeCondutor;
+        this.veiculoId = veiculoId;
+        this.placaVeiculo = placaVeiculo;
         this.tipoInfracaoId = tipoInfracaoId;
         this.codigoInfracao = codigoInfracao;
         this.descricaoInfracao = descricaoInfracao;
+        this.gravidade = gravidade;
         this.pontos = pontos;
         this.valor = valor;
         this.dataHora = dataHora;
@@ -52,20 +62,20 @@ public class InfracaoResponse {
         return id;
     }
 
-    public Long getVeiculoId() {
-        return veiculoId;
-    }
-
-    public String getPlaca() {
-        return placa;
-    }
-
     public Long getCondutorId() {
         return condutorId;
     }
 
     public String getNomeCondutor() {
         return nomeCondutor;
+    }
+
+    public Long getVeiculoId() {
+        return veiculoId;
+    }
+
+    public String getPlacaVeiculo() {
+        return placaVeiculo;
     }
 
     public Long getTipoInfracaoId() {
@@ -78,6 +88,10 @@ public class InfracaoResponse {
 
     public String getDescricaoInfracao() {
         return descricaoInfracao;
+    }
+
+    public GravidadeInfracao getGravidade() {
+        return gravidade;
     }
 
     public Integer getPontos() {

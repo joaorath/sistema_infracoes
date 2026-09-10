@@ -11,15 +11,15 @@ public class Infracao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "veiculo_id", nullable = false)
-    private Veiculo veiculo;
-
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "condutor_id", nullable = false)
     private Condutor condutor;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @JoinColumn(name = "veiculo_id", nullable = false)
+    private Veiculo veiculo;
+
+    @ManyToOne
     @JoinColumn(name = "tipo_infracao_id", nullable = false)
     private TipoInfracao tipoInfracao;
 
@@ -33,20 +33,20 @@ public class Infracao {
         return id;
     }
 
-    public Veiculo getVeiculo() {
-        return veiculo;
-    }
-
-    public void setVeiculo(Veiculo veiculo) {
-        this.veiculo = veiculo;
-    }
-
     public Condutor getCondutor() {
         return condutor;
     }
 
     public void setCondutor(Condutor condutor) {
         this.condutor = condutor;
+    }
+
+    public Veiculo getVeiculo() {
+        return veiculo;
+    }
+
+    public void setVeiculo(Veiculo veiculo) {
+        this.veiculo = veiculo;
     }
 
     public TipoInfracao getTipoInfracao() {

@@ -10,4 +10,6 @@ public interface InfracaoRepository extends JpaRepository<Infracao, Long> {
     List<Infracao> findByCondutorId(Long condutorId);
 
     List<Infracao> findByVeiculoId(Long veiculoId);
+
+    List<Infracao> findByTipoInfracaoId(Long tipoInfracaoId);
 }
