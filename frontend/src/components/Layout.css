@@ -1,0 +1,44 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #0f172a;
+}
+
+.sidebar {
+  width: 260px;
+  background: #111827;
+  color: #ffffff;
+  padding: 24px 20px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar h2 {
+  margin: 0 0 24px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar nav a {
+  text-decoration: none;
+  color: #dbeafe;
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+.sidebar nav a:hover {
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.main-content {
+  flex: 1;
+  padding: 32px;
+}

@@ -25,19 +25,22 @@ export default function Condutores() {
   const [erro, setErro] = useState("");
 
   async function carregarCondutores() {
-    try {
-      setCarregando(true);
+  try {
+    setCarregando(true);
 
-      const dados = await listarCondutores();
+    const dados = await listarCondutores();
+    setCondutores(dados);
+  } catch (error: any) {
+    console.error(error);
 
-      setCondutores(dados);
-    } catch (error) {
-      console.error(error);
-      setErro("Não foi possível carregar os condutores.");
-    } finally {
-      setCarregando(false);
-    }
+    setErro(
+      error.response?.data?.message ||
+        "Não foi possível carregar os condutores."
+    );
+  } finally {
+    setCarregando(false);
   }
+}
 
   useEffect(() => {
     carregarCondutores();
@@ -91,14 +94,15 @@ export default function Condutores() {
       setNumeroCnh("");
 
       await carregarCondutores();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
 
-      if (editandoId !== null) {
-        setErro("Não foi possível atualizar o condutor.");
-      } else {
-        setErro("Não foi possível cadastrar o condutor.");
-      }
+      setErro(
+        error.response?.data?.message ||
+          (editandoId !== null
+            ? "Não foi possível atualizar o condutor."
+            : "Não foi possível cadastrar o condutor.")
+      );
     } finally {
       setSalvando(false);
     }

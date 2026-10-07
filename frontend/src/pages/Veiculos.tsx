@@ -195,11 +195,14 @@ export default function Veiculos() {
 
             if (error.response?.status === 409) {
                 setErro(
-                    error.response.data ||
+                    error.response?.data?.message ||
                     "Não é possível excluir este veículo porque existem infrações vinculadas a ele."
                 );
             } else {
-                setErro("Não foi possível excluir o veículo.");
+                setErro(
+                    error.response?.data?.message ||
+                    "Não foi possível excluir o veículo."
+                );
             }
         }
     }

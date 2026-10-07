@@ -6,8 +6,6 @@ import com.transito.sistema.entity.Condutor;
 import com.transito.sistema.service.CondutorService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
@@ -27,8 +25,10 @@ public class CondutorController {
     }
 
     @GetMapping("/{id}")
-    public Condutor buscarPorId(@PathVariable Long id) {
-        return condutorService.buscarPorId(id);
+    public CondutorResponse buscarPorId(
+            @PathVariable Long id) {
+
+        return condutorService.buscarResponsePorId(id);
     }
 
     @PostMapping

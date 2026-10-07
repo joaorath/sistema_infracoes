@@ -6,6 +6,8 @@ import com.transito.sistema.entity.TipoInfracao;
 import com.transito.sistema.exception.ResourceNotFoundException;
 import com.transito.sistema.repository.TipoInfracaoRepository;
 import org.springframework.stereotype.Service;
+import com.transito.sistema.exception.BusinessException;
+import com.transito.sistema.repository.InfracaoRepository;
 
 import java.util.List;
 
@@ -13,11 +15,15 @@ import java.util.List;
 public class TipoInfracaoService {
 
     private final TipoInfracaoRepository tipoInfracaoRepository;
+    private final InfracaoRepository infracaoRepository;
 
     public TipoInfracaoService(
-            TipoInfracaoRepository tipoInfracaoRepository) {
+                TipoInfracaoRepository tipoInfracaoRepository,
+                InfracaoRepository infracaoRepository) {
+
         this.tipoInfracaoRepository = tipoInfracaoRepository;
-    }
+        this.infracaoRepository = infracaoRepository;
+        }
 
     public TipoInfracaoResponse salvar(TipoInfracaoRequest request) {
 
@@ -52,14 +58,25 @@ public class TipoInfracaoService {
     }
 
     public TipoInfracaoResponse atualizar(
-            Long id,
-            TipoInfracaoRequest request) {
+        Long id,
+        TipoInfracaoRequest request) {
 
         TipoInfracao tipoInfracao = tipoInfracaoRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Tipo de infração não encontrado"
                         ));
+
+        boolean possuiInfracoes =
+                !infracaoRepository.findByTipoInfracaoId(id).isEmpty();
+
+        if (possuiInfracoes
+                && !tipoInfracao.getPontos().equals(request.getPontos())) {
+
+                throw new BusinessException(
+                        "Não é possível alterar os pontos deste tipo de infração porque existem infrações vinculadas a ele."
+                );
+        }
 
         tipoInfracao.setCodigo(request.getCodigo());
         tipoInfracao.setDescricao(request.getDescricao());
@@ -71,7 +88,7 @@ public class TipoInfracaoService {
                 tipoInfracaoRepository.save(tipoInfracao);
 
         return converterParaResponse(atualizado);
-    }
+        }
 
     public void excluir(Long id) {
 
@@ -82,8 +99,15 @@ public class TipoInfracaoService {
                                         "Tipo de infração não encontrado"
                                 ));
 
+        if (!infracaoRepository.findByTipoInfracaoId(id).isEmpty()) {
+
+                throw new BusinessException(
+                        "Não é possível excluir o tipo de infração porque existem infrações vinculadas a ele."
+                );
+        }
+
         tipoInfracaoRepository.delete(tipoInfracao);
-    }
+        }
 
     private TipoInfracaoResponse converterParaResponse(
             TipoInfracao tipoInfracao) {

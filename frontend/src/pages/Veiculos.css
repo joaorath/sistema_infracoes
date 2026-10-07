@@ -1,215 +1,233 @@
 .veiculos-page {
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.veiculos-page .page-header {
-    text-align: center;
-    margin-bottom: 35px;
+.page-header h1 {
+  font-size: 42px;
+  color: #ffffff;
+  margin-bottom: 8px;
 }
 
-.veiculos-page .page-header h1 {
-    font-size: 40px;
-    margin-bottom: 8px;
-}
-
-.veiculos-page .page-header p {
-    color: #8fa6c1;
-    font-size: 18px;
+.page-header p {
+  color: #cbd5e1;
+  font-size: 18px;
 }
 
 .veiculos-content {
-    display: grid;
-    grid-template-columns: 390px 1fr;
-    gap: 28px;
-    align-items: start;
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 24px;
+  align-items: start;
 }
 
-.veiculos-page .form-card,
-.veiculos-page .table-card {
-    background: #1f2b3d;
-    border: 1px solid #34445d;
-    border-radius: 14px;
-    padding: 28px;
+.form-card,
+.table-card {
+  background: #ffffff;
+  color: #111827;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-.veiculos-page .form-card h2,
-.veiculos-page .table-card h2 {
-    margin-top: 0;
-    margin-bottom: 24px;
+.form-card h2,
+.table-card h2 {
+  color: #111827;
+  margin-bottom: 20px;
+  font-size: 32px;
 }
 
-.veiculos-page .form-group {
-    margin-bottom: 20px;
+.form-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.veiculos-page label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.veiculos-page input,
-.veiculos-page select {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #465875;
-    background: #101827;
-    color: white;
-    font-size: 15px;
+.form-group label {
+  color: #374151;
+  font-weight: 600;
 }
 
-.veiculos-page input:focus,
-.veiculos-page select:focus {
-    outline: none;
-    border-color: #2864e8;
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 16px;
+  outline: none;
 }
 
-.veiculos-page select {
-    cursor: pointer;
+.form-group input::placeholder {
+  color: #9ca3af;
 }
 
-.veiculos-page form > button[type="submit"] {
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    padding: 13px;
-    background: #2864e8;
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.veiculos-page form > button[type="submit"]:hover {
-    background: #1f56d0;
+.form-card button {
+  border: none;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.veiculos-page form > button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
+.form-card button[type="submit"] {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.form-card button[type="submit"]:hover {
+  background: #1d4ed8;
 }
 
 .cancel-button {
-    width: 100%;
-    margin-top: 10px;
-    padding: 11px;
-    border: 1px solid #56677f;
-    border-radius: 8px;
-    background: transparent;
-    color: white;
-    cursor: pointer;
+  background: #e5e7eb;
+  color: #111827;
 }
 
 .cancel-button:hover {
-    background: #2c394d;
+  background: #d1d5db;
+}
+
+.form-card button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .success-message {
-    background: #0d6334;
-    color: white;
-    padding: 13px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    text-align: center;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+  padding: 12px;
+  border-radius: 10px;
 }
 
 .error-message {
-    background: #8b1e2d;
-    color: white;
-    padding: 13px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    text-align: center;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  padding: 12px;
+  border-radius: 10px;
 }
 
 .table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
 }
 
 .table-header span {
-    color: #8fa6c1;
+  color: #6b7280;
+  font-weight: 600;
 }
 
 .table-container {
-    overflow-x: auto;
+  overflow-x: auto;
 }
 
-.veiculos-page table {
-    width: 100%;
-    border-collapse: collapse;
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.veiculos-page th,
-.veiculos-page td {
-    padding: 16px 12px;
-    text-align: left;
-    border-bottom: 1px solid #34445d;
+thead tr {
+  background: #f3f4f6;
 }
 
-.veiculos-page th {
-    color: #9fb1c9;
-    font-size: 14px;
+th,
+td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
+  vertical-align: middle;
 }
 
-.veiculos-page td {
-    color: #f2f5f8;
+th {
+  font-weight: 700;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.edit-button,
+.delete-button {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
 }
 
 .edit-button {
-    border: none;
-    border-radius: 5px;
-    padding: 7px 12px;
-    background: #6c757d;
-    color: white;
-    cursor: pointer;
+  background: #374151;
+  color: #ffffff;
 }
 
 .edit-button:hover {
-    background: #5a6268;
+  background: #1f2937;
+}
+
+.delete-button {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.delete-button:hover {
+  background: #b91c1c;
 }
 
 .loading,
 .empty {
-    color: #8fa6c1;
-    text-align: center;
-    padding: 30px;
+  color: #374151;
+  padding: 20px 0;
 }
 
-@media (max-width: 1100px) {
-    .veiculos-content {
-        grid-template-columns: 1fr;
-    }
+@media (max-width: 1000px) {
+  .veiculos-content {
+    grid-template-columns: 1fr;
+  }
 }
 
-@media (max-width: 700px) {
-    .veiculos-page .form-card,
-    .veiculos-page .table-card {
-        padding: 18px;
-    }
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 32px;
+  }
 
-    .veiculos-page .page-header h1 {
-        font-size: 32px;
-    }
-}
+  .form-card h2,
+  .table-card h2 {
+    font-size: 24px;
+  }
 
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
+  .form-card,
+  .table-card {
+    padding: 18px;
+  }
 
-.delete-button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.delete-button:hover {
-    opacity: 0.85;
+  th,
+  td {
+    font-size: 14px;
+    padding: 12px 10px;
+  }
 }

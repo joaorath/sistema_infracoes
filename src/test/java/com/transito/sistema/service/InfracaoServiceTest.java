@@ -6,6 +6,7 @@ import com.transito.sistema.entity.Condutor;
 import com.transito.sistema.entity.Infracao;
 import com.transito.sistema.entity.TipoInfracao;
 import com.transito.sistema.entity.Veiculo;
+import com.transito.sistema.enums.GravidadeInfracao;
 import com.transito.sistema.repository.CondutorRepository;
 import com.transito.sistema.repository.InfracaoRepository;
 import com.transito.sistema.repository.TipoInfracaoRepository;
@@ -15,17 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.transito.sistema.enums.GravidadeInfracao;
-import com.transito.sistema.exception.ResourceNotFoundException;
 
 import java.math.BigDecimal;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -36,10 +32,10 @@ class InfracaoServiceTest {
     private InfracaoRepository infracaoRepository;
 
     @Mock
-    private VeiculoRepository veiculoRepository;
+    private CondutorRepository condutorRepository;
 
     @Mock
-    private CondutorRepository condutorRepository;
+    private VeiculoRepository veiculoRepository;
 
     @Mock
     private TipoInfracaoRepository tipoInfracaoRepository;
@@ -48,216 +44,275 @@ class InfracaoServiceTest {
     private InfracaoService infracaoService;
 
     @Test
-    void deveRegistrarInfracaoEAdicionarPontosAoCondutor() {
+    void deveCadastrarInfracaoEAdicionarPontosAoCondutor() {
 
-        // Arrange
-        Condutor condutor = new Condutor();
-        condutor.setNome("Joao da Silva");
-        condutor.setCpf("12345678900");
-        condutor.setNumeroCnh("12345678901");
-        condutor.setPontuacaoCnh(0);
+        Condutor condutor = criarCondutor(0);
 
-        Veiculo veiculo = new Veiculo();
-        veiculo.setCondutor(condutor);
+        Veiculo veiculo = criarVeiculo(condutor);
 
-        TipoInfracao tipoInfracao = new TipoInfracao();
-        tipoInfracao.setCodigo("001");
-        tipoInfracao.setDescricao("Avançar sinal vermelho");
-        tipoInfracao.setGravidade(GravidadeInfracao.GRAVISSIMA);
-        tipoInfracao.setPontos(7);
-        tipoInfracao.setValor(BigDecimal.valueOf(293.47));
+        TipoInfracao tipo = criarTipoInfracao(5);
 
-        InfracaoRequest request = new InfracaoRequest();
-        request.setVeiculoId(1L);
-        request.setCondutorId(1L);
-        request.setTipoInfracaoId(1L);
-        request.setDataHora(LocalDateTime.of(2026, 8, 24, 16, 0));
-
-        Infracao infracaoSalva = new Infracao();
-        infracaoSalva.setVeiculo(veiculo);
-        infracaoSalva.setCondutor(condutor);
-        infracaoSalva.setTipoInfracao(tipoInfracao);
-        infracaoSalva.setDataHora(request.getDataHora());
-
-        when(veiculoRepository.findById(1L))
-                .thenReturn(Optional.of(veiculo));
+        InfracaoRequest request = criarRequest();
 
         when(condutorRepository.findById(1L))
                 .thenReturn(Optional.of(condutor));
+
+        when(veiculoRepository.findById(1L))
+                .thenReturn(Optional.of(veiculo));
 
         when(tipoInfracaoRepository.findById(1L))
-                .thenReturn(Optional.of(tipoInfracao));
+                .thenReturn(Optional.of(tipo));
 
         when(infracaoRepository.save(any(Infracao.class)))
-                .thenReturn(infracaoSalva);
+                .thenAnswer(invocation ->
+                        invocation.getArgument(0));
 
-        // Act
-        InfracaoResponse resultado = infracaoService.salvar(request);
+        InfracaoResponse response =
+                infracaoService.salvar(request);
 
-        // Assert
-        assertNotNull(resultado);
+        assertNotNull(response);
 
-        assertEquals(7, condutor.getPontuacaoCnh());
-
-        verify(condutorRepository, times(1))
-                .save(condutor);
+        assertEquals(
+                5,
+                condutor.getPontuacaoCnh()
+        );
 
         verify(infracaoRepository, times(1))
                 .save(any(Infracao.class));
-    }
-
-    @Test
-    void deveLancarExcecaoQuandoVeiculoNaoExiste() {
-
-        InfracaoRequest request = new InfracaoRequest();
-
-        request.setVeiculoId(999L);
-        request.setCondutorId(1L);
-        request.setTipoInfracaoId(1L);
-        request.setDataHora(LocalDateTime.now());
-
-        when(veiculoRepository.findById(999L))
-                .thenReturn(Optional.empty());
-
-        assertThrows(
-                ResourceNotFoundException.class,
-                () -> infracaoService.salvar(request));
-
-        verify(veiculoRepository, times(1))
-                .findById(999L);
-
-        verifyNoInteractions(
-                condutorRepository,
-                tipoInfracaoRepository,
-                infracaoRepository);
-    }
-
-    @Test
-    void deveLancarExcecaoQuandoCondutorNaoExiste() {
-
-        InfracaoRequest request = new InfracaoRequest();
-
-        request.setVeiculoId(1L);
-        request.setCondutorId(999L);
-        request.setTipoInfracaoId(1L);
-        request.setDataHora(LocalDateTime.now());
-
-        Veiculo veiculo = new Veiculo();
-
-        when(veiculoRepository.findById(1L))
-                .thenReturn(Optional.of(veiculo));
-
-        when(condutorRepository.findById(999L))
-                .thenReturn(Optional.empty());
-
-        assertThrows(
-                ResourceNotFoundException.class,
-                () -> infracaoService.salvar(request));
-
-        verify(veiculoRepository, times(1))
-                .findById(1L);
 
         verify(condutorRepository, times(1))
-                .findById(999L);
-
-        verifyNoInteractions(
-                tipoInfracaoRepository,
-                infracaoRepository);
+                .save(condutor);
     }
 
     @Test
-    void deveLancarExcecaoQuandoTipoInfracaoNaoExiste() {
+    void deveExcluirInfracaoERemoverPontosDoCondutor() {
 
-        InfracaoRequest request = new InfracaoRequest();
+        Condutor condutor = criarCondutor(5);
 
-        request.setVeiculoId(1L);
-        request.setCondutorId(1L);
-        request.setTipoInfracaoId(999L);
-        request.setDataHora(LocalDateTime.now());
+        Veiculo veiculo = criarVeiculo(condutor);
 
-        Veiculo veiculo = new Veiculo();
+        TipoInfracao tipo = criarTipoInfracao(5);
 
-        Condutor condutor = new Condutor();
+        Infracao infracao = new Infracao();
 
-        when(veiculoRepository.findById(1L))
-                .thenReturn(Optional.of(veiculo));
+        infracao.setCondutor(condutor);
+        infracao.setVeiculo(veiculo);
+        infracao.setTipoInfracao(tipo);
+        infracao.setDataHora(LocalDateTime.now());
+
+        when(infracaoRepository.findById(1L))
+                .thenReturn(Optional.of(infracao));
+
+        infracaoService.excluir(1L);
+
+        assertEquals(
+                0,
+                condutor.getPontuacaoCnh()
+        );
+
+        verify(infracaoRepository, times(1))
+                .delete(infracao);
+
+        verify(condutorRepository, times(1))
+                .save(condutor);
+    }
+
+    @Test
+    void deveAtualizarInfracaoERecalcularPontos() {
+
+        Condutor condutor = criarCondutor(5);
+
+        Veiculo veiculo = criarVeiculo(condutor);
+
+        TipoInfracao tipoAnterior =
+                criarTipoInfracao(5);
+
+        TipoInfracao novoTipo =
+                criarTipoInfracao(7);
+
+        Infracao infracao = new Infracao();
+
+        infracao.setCondutor(condutor);
+        infracao.setVeiculo(veiculo);
+        infracao.setTipoInfracao(tipoAnterior);
+        infracao.setDataHora(LocalDateTime.now());
+
+        InfracaoRequest request =
+                criarRequest();
+
+        when(infracaoRepository.findById(1L))
+                .thenReturn(Optional.of(infracao));
 
         when(condutorRepository.findById(1L))
                 .thenReturn(Optional.of(condutor));
 
-        when(tipoInfracaoRepository.findById(999L))
-                .thenReturn(Optional.empty());
+        when(veiculoRepository.findById(1L))
+                .thenReturn(Optional.of(veiculo));
 
-        assertThrows(
-                ResourceNotFoundException.class,
-                () -> infracaoService.salvar(request));
+        when(tipoInfracaoRepository.findById(1L))
+                .thenReturn(Optional.of(novoTipo));
 
-        verify(veiculoRepository, times(1))
-                .findById(1L);
+        when(infracaoRepository.save(any(Infracao.class)))
+                .thenAnswer(invocation ->
+                        invocation.getArgument(0));
 
-        verify(condutorRepository, times(1))
-                .findById(1L);
+        infracaoService.atualizar(
+                1L,
+                request
+        );
 
-        verify(tipoInfracaoRepository, times(1))
-                .findById(999L);
-
-        verifyNoInteractions(infracaoRepository);
+        assertEquals(
+                7,
+                condutor.getPontuacaoCnh()
+        );
     }
 
     @Test
-    void deveSomarPontosAosPontosJaExistentesDoCondutor() {
+    void naoDeveCadastrarInfracaoComVeiculoDeOutroCondutor() {
 
-        Condutor condutor = new Condutor();
-        condutor.setNome("Joao da Silva");
-        condutor.setCpf("12345678900");
-        condutor.setNumeroCnh("12345678901");
-        condutor.setPontuacaoCnh(7);
+        Condutor condutor = criarCondutor(0);
 
-        Veiculo veiculo = new Veiculo();
-        veiculo.setCondutor(condutor);
+        Condutor outroCondutor =
+                criarCondutor(0);
 
-        TipoInfracao tipoInfracao = new TipoInfracao();
-        tipoInfracao.setCodigo("002");
-        tipoInfracao.setDescricao("Estacionar em local proibido");
-        tipoInfracao.setGravidade(GravidadeInfracao.MEDIA);
-        tipoInfracao.setPontos(4);
-        tipoInfracao.setValor(BigDecimal.valueOf(130.16));
+        Veiculo veiculo =
+                criarVeiculo(outroCondutor);
 
-        InfracaoRequest request = new InfracaoRequest();
+        TipoInfracao tipo =
+                criarTipoInfracao(5);
 
-        request.setVeiculoId(1L);
+        InfracaoRequest request =
+                criarRequest();
+
+        when(condutorRepository.findById(1L))
+                .thenReturn(Optional.of(condutor));
+
+        when(veiculoRepository.findById(1L))
+                .thenReturn(Optional.of(veiculo));
+
+        when(tipoInfracaoRepository.findById(1L))
+                .thenReturn(Optional.of(tipo));
+
+        IllegalArgumentException exception =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                infracaoService.salvar(
+                                        request
+                                )
+                );
+
+        assertEquals(
+                "O veículo informado não pertence ao condutor.",
+                exception.getMessage()
+        );
+
+        verify(
+                infracaoRepository,
+                never()
+        ).save(any());
+    }
+
+    private Condutor criarCondutor(
+            int pontos) {
+
+        Condutor condutor =
+                new Condutor();
+
+        condutor.setNome(
+                "João Teste"
+        );
+
+        condutor.setCpf(
+                "12345678900"
+        );
+
+        condutor.setNumeroCnh(
+                "12345678901"
+        );
+
+        condutor.setPontuacaoCnh(
+                pontos
+        );
+
+        return condutor;
+    }
+
+    private Veiculo criarVeiculo(
+            Condutor condutor) {
+
+        Veiculo veiculo =
+                new Veiculo();
+
+        veiculo.setPlaca(
+                "ABC1D23"
+        );
+
+        veiculo.setRenavam(
+                "12345678901"
+        );
+
+        veiculo.setMarca(
+                "Toyota"
+        );
+
+        veiculo.setModelo(
+                "Corolla"
+        );
+
+        veiculo.setAno(
+                2022
+        );
+
+        veiculo.setCondutor(
+                condutor
+        );
+
+        return veiculo;
+    }
+
+    private TipoInfracao criarTipoInfracao(
+            int pontos) {
+
+        TipoInfracao tipo =
+                new TipoInfracao();
+
+        tipo.setCodigo(
+                "TESTE001"
+        );
+
+        tipo.setDescricao(
+                "Infração de teste"
+        );
+
+        tipo.setGravidade(
+                GravidadeInfracao.GRAVE
+        );
+
+        tipo.setPontos(
+                pontos
+        );
+
+        tipo.setValor(
+                new BigDecimal("195.23")
+        );
+
+        return tipo;
+    }
+
+    private InfracaoRequest criarRequest() {
+
+        InfracaoRequest request =
+                new InfracaoRequest();
+
         request.setCondutorId(1L);
-        request.setTipoInfracaoId(2L);
+        request.setVeiculoId(1L);
+        request.setTipoInfracaoId(1L);
+
         request.setDataHora(
-                LocalDateTime.of(2026, 8, 24, 17, 0));
+                LocalDateTime.now()
+        );
 
-        Infracao infracaoSalva = new Infracao();
-
-        infracaoSalva.setVeiculo(veiculo);
-        infracaoSalva.setCondutor(condutor);
-        infracaoSalva.setTipoInfracao(tipoInfracao);
-        infracaoSalva.setDataHora(request.getDataHora());
-
-        when(veiculoRepository.findById(1L))
-                .thenReturn(Optional.of(veiculo));
-
-        when(condutorRepository.findById(1L))
-                .thenReturn(Optional.of(condutor));
-
-        when(tipoInfracaoRepository.findById(2L))
-                .thenReturn(Optional.of(tipoInfracao));
-
-        when(infracaoRepository.save(any(Infracao.class)))
-                .thenReturn(infracaoSalva);
-
-        infracaoService.salvar(request);
-
-        assertEquals(11, condutor.getPontuacaoCnh());
-
-        verify(condutorRepository, times(1))
-                .save(condutor);
-
-        verify(infracaoRepository, times(1))
-                .save(any(Infracao.class));
+        return request;
     }
 }

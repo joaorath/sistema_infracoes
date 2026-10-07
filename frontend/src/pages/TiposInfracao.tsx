@@ -2,467 +2,485 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 
 import {
-    cadastrarTipoInfracao,
-    listarTiposInfracao,
-    atualizarTipoInfracao,
-    excluirTipoInfracao,
+  cadastrarTipoInfracao,
+  listarTiposInfracao,
+  atualizarTipoInfracao,
+  excluirTipoInfracao,
 } from "../services/tipoInfracaoService";
 
 import type {
-    TipoInfracao,
-    TipoInfracaoRequest,
+  TipoInfracao,
+  TipoInfracaoRequest,
 } from "../services/tipoInfracaoService";
 
 import "./TiposInfracao.css";
 
 export default function TiposInfracao() {
-    const [tipos, setTipos] = useState<TipoInfracao[]>([]);
+  const [tipos, setTipos] = useState<TipoInfracao[]>([]);
 
-    const [codigo, setCodigo] = useState("");
-    const [descricao, setDescricao] = useState("");
-    const [gravidade, setGravidade] =
-        useState<TipoInfracaoRequest["gravidade"]>("LEVE");
-    const [pontos, setPontos] = useState("");
-    const [valor, setValor] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [descricao, setDescricao] = useState("");
 
-    const [editandoId, setEditandoId] =
-        useState<number | null>(null);
+  const [gravidade, setGravidade] =
+    useState<TipoInfracaoRequest["gravidade"]>("LEVE");
 
-    const [carregando, setCarregando] = useState(true);
-    const [salvando, setSalvando] = useState(false);
+  const [pontos, setPontos] = useState("");
+  const [valor, setValor] = useState("");
 
-    const [mensagem, setMensagem] = useState("");
-    const [erro, setErro] = useState("");
+  const [editandoId, setEditandoId] =
+    useState<number | null>(null);
 
-    async function carregarTipos() {
-        try {
-            setCarregando(true);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
 
-            const dados = await listarTiposInfracao();
+  const [mensagem, setMensagem] = useState("");
+  const [erro, setErro] = useState("");
 
-            setTipos(dados);
-        } catch (error) {
-            console.error(error);
-            setErro(
-                "Não foi possível carregar os tipos de infração."
-            );
-        } finally {
-            setCarregando(false);
-        }
+  async function carregarTipos() {
+    try {
+      setCarregando(true);
+
+      const dados = await listarTiposInfracao();
+
+      setTipos(dados);
+    } catch (error: any) {
+      console.error(error);
+
+      setErro(
+        error.response?.data?.message ||
+          "Não foi possível carregar os tipos de infração."
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  useEffect(() => {
+    carregarTipos();
+  }, []);
+
+  function limparFormulario() {
+    setCodigo("");
+    setDescricao("");
+    setGravidade("LEVE");
+    setPontos("");
+    setValor("");
+    setEditandoId(null);
+  }
+
+  function iniciarEdicao(tipo: TipoInfracao) {
+    setEditandoId(tipo.id);
+
+    setCodigo(tipo.codigo);
+    setDescricao(tipo.descricao);
+    setGravidade(tipo.gravidade);
+    setPontos(String(tipo.pontos));
+    setValor(String(tipo.valor));
+
+    setMensagem("");
+    setErro("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  async function handleExcluir(id: number) {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir este tipo de infração?"
+    );
+
+    if (!confirmar) {
+      return;
     }
 
-    useEffect(() => {
-        carregarTipos();
-    }, []);
+    setMensagem("");
+    setErro("");
 
-    function limparFormulario() {
-        setCodigo("");
-        setDescricao("");
-        setGravidade("LEVE");
-        setPontos("");
-        setValor("");
-        setEditandoId(null);
+    try {
+      await excluirTipoInfracao(id);
+
+      setMensagem(
+        "Tipo de infração excluído com sucesso!"
+      );
+
+      if (editandoId === id) {
+        limparFormulario();
+      }
+
+      await carregarTipos();
+    } catch (error: any) {
+      console.error(error);
+
+      setErro(
+        error.response?.data?.message ||
+          "Não foi possível excluir o tipo de infração."
+      );
+    }
+  }
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+
+    setMensagem("");
+    setErro("");
+
+    if (codigo.trim().length < 3) {
+      setErro(
+        "O código deve possuir pelo menos 3 caracteres."
+      );
+
+      return;
     }
 
-    function iniciarEdicao(tipo: TipoInfracao) {
-        setEditandoId(tipo.id);
+    if (descricao.trim().length < 5) {
+      setErro(
+        "A descrição deve possuir pelo menos 5 caracteres."
+      );
 
-        setCodigo(tipo.codigo);
-        setDescricao(tipo.descricao);
-        setGravidade(tipo.gravidade);
-        setPontos(String(tipo.pontos));
-        setValor(String(tipo.valor));
-
-        setMensagem("");
-        setErro("");
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
+      return;
     }
 
-    async function handleExcluir(id: number) {
-        const confirmar = window.confirm(
-            "Tem certeza que deseja excluir este tipo de infração?"
+    if (!gravidade) {
+      setErro("Selecione a gravidade.");
+      return;
+    }
+
+    if (!pontos) {
+      setErro("Informe a quantidade de pontos.");
+      return;
+    }
+
+    if (Number(pontos) < 0) {
+      setErro("Os pontos não podem ser negativos.");
+      return;
+    }
+
+    if (!valor) {
+      setErro("Informe o valor da multa.");
+      return;
+    }
+
+    if (Number(valor) < 0) {
+      setErro("O valor não pode ser negativo.");
+      return;
+    }
+
+    const dados: TipoInfracaoRequest = {
+      codigo: codigo.trim().toUpperCase(),
+      descricao: descricao.trim(),
+      gravidade,
+      pontos: Number(pontos),
+      valor: Number(valor),
+    };
+
+    try {
+      setSalvando(true);
+
+      if (editandoId !== null) {
+        await atualizarTipoInfracao(
+          editandoId,
+          dados
         );
 
-        if (!confirmar) {
-            return;
-        }
+        setMensagem(
+          "Tipo de infração atualizado com sucesso!"
+        );
+      } else {
+        await cadastrarTipoInfracao(dados);
 
-        setMensagem("");
-        setErro("");
+        setMensagem(
+          "Tipo de infração cadastrado com sucesso!"
+        );
+      }
 
-        try {
-            await excluirTipoInfracao(id);
+      limparFormulario();
 
-            setMensagem(
-                "Tipo de infração excluído com sucesso!"
-            );
+      await carregarTipos();
+    } catch (error: any) {
+      console.error(error);
 
-            await carregarTipos();
-        } catch (error) {
-            console.error(error);
-
-            setErro(
-                "Não foi possível excluir o tipo de infração."
-            );
-        }
+      setErro(
+        error.response?.data?.message ||
+          (editandoId !== null
+            ? "Não foi possível atualizar o tipo de infração."
+            : "Não foi possível cadastrar o tipo de infração.")
+      );
+    } finally {
+      setSalvando(false);
     }
+  }
 
-    async function handleSubmit(event: FormEvent) {
-        event.preventDefault();
+  function formatarGravidade(gravidade: string) {
+    switch (gravidade) {
+      case "LEVE":
+        return "Leve";
 
-        setMensagem("");
-        setErro("");
+      case "MEDIA":
+        return "Média";
 
-        if (codigo.trim().length < 3) {
-            setErro(
-                "O código deve possuir pelo menos 3 caracteres."
-            );
-            return;
-        }
+      case "GRAVE":
+        return "Grave";
 
-        if (descricao.trim().length < 5) {
-            setErro(
-                "A descrição deve possuir pelo menos 5 caracteres."
-            );
-            return;
-        }
+      case "GRAVISSIMA":
+        return "Gravíssima";
 
-        if (!gravidade) {
-            setErro("Selecione a gravidade.");
-            return;
-        }
-
-        if (!pontos) {
-            setErro("Informe a quantidade de pontos.");
-            return;
-        }
-
-        if (Number(pontos) < 0) {
-            setErro("Os pontos não podem ser negativos.");
-            return;
-        }
-
-        if (!valor) {
-            setErro("Informe o valor da multa.");
-            return;
-        }
-
-        if (Number(valor) < 0) {
-            setErro("O valor não pode ser negativo.");
-            return;
-        }
-
-        const dados: TipoInfracaoRequest = {
-            codigo: codigo.trim().toUpperCase(),
-            descricao: descricao.trim(),
-            gravidade,
-            pontos: Number(pontos),
-            valor: Number(valor),
-        };
-
-        try {
-            setSalvando(true);
-
-            if (editandoId !== null) {
-                await atualizarTipoInfracao(
-                    editandoId,
-                    dados
-                );
-
-                setMensagem(
-                    "Tipo de infração atualizado com sucesso!"
-                );
-            } else {
-                await cadastrarTipoInfracao(dados);
-
-                setMensagem(
-                    "Tipo de infração cadastrado com sucesso!"
-                );
-            }
-
-            limparFormulario();
-
-            await carregarTipos();
-        } catch (error) {
-            console.error(error);
-
-            setErro(
-                editandoId !== null
-                    ? "Não foi possível atualizar o tipo de infração."
-                    : "Não foi possível cadastrar o tipo de infração."
-            );
-        } finally {
-            setSalvando(false);
-        }
+      default:
+        return gravidade;
     }
+  }
 
-    return (
-        <div className="tipos-infracao-page">
-            <div className="page-header">
-                <div>
-                    <h1>Tipos de Infração</h1>
+  function formatarValor(valor: number) {
+    return Number(valor).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
 
-                    <p>
-                        Cadastro e consulta dos tipos de
-                        infrações de trânsito.
-                    </p>
-                </div>
+  return (
+    <div className="tipos-infracao-page">
+      <div className="page-header">
+        <div>
+          <h1>Tipos de Infração</h1>
+
+          <p>
+            Cadastro e consulta dos tipos de infrações de trânsito.
+          </p>
+        </div>
+      </div>
+
+      <div className="tipos-infracao-content">
+        <section className="form-card">
+          <h2>
+            {editandoId !== null
+              ? "Editar tipo de infração"
+              : "Novo tipo de infração"}
+          </h2>
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="codigo">
+                Código
+              </label>
+
+              <input
+                id="codigo"
+                type="text"
+                maxLength={20}
+                value={codigo}
+                onChange={(event) =>
+                  setCodigo(event.target.value)
+                }
+                placeholder="Ex.: 005"
+              />
             </div>
 
-            <div className="tipos-infracao-content">
-                <section className="form-card">
-                    <h2>
-                        {editandoId !== null
-                            ? "Editar tipo de infração"
-                            : "Novo tipo de infração"}
-                    </h2>
+            <div className="form-group">
+              <label htmlFor="descricao">
+                Descrição
+              </label>
 
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="codigo">
-                                Código
-                            </label>
+              <input
+                id="descricao"
+                type="text"
+                maxLength={255}
+                value={descricao}
+                onChange={(event) =>
+                  setDescricao(event.target.value)
+                }
+                placeholder="Ex.: Dirigir sem habilitação"
+              />
+            </div>
 
-                            <input
-                                id="codigo"
-                                type="text"
-                                maxLength={20}
-                                value={codigo}
-                                onChange={(event) =>
-                                    setCodigo(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Ex.: 005"
-                            />
-                        </div>
+            <div className="form-group">
+              <label htmlFor="gravidade">
+                Gravidade
+              </label>
 
-                        <div className="form-group">
-                            <label htmlFor="descricao">
-                                Descrição
-                            </label>
+              <select
+                id="gravidade"
+                value={gravidade}
+                onChange={(event) =>
+                  setGravidade(
+                    event.target
+                      .value as TipoInfracaoRequest["gravidade"]
+                  )
+                }
+              >
+                <option value="LEVE">
+                  Leve
+                </option>
 
-                            <input
-                                id="descricao"
-                                type="text"
-                                maxLength={255}
-                                value={descricao}
-                                onChange={(event) =>
-                                    setDescricao(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Ex.: Dirigir sem habilitação"
-                            />
-                        </div>
+                <option value="MEDIA">
+                  Média
+                </option>
 
-                        <div className="form-group">
-                            <label htmlFor="gravidade">
-                                Gravidade
-                            </label>
+                <option value="GRAVE">
+                  Grave
+                </option>
 
-                            <select
-                                id="gravidade"
-                                value={gravidade}
-                                onChange={(event) =>
-                                    setGravidade(
-                                        event.target.value as TipoInfracaoRequest["gravidade"]
-                                    )
-                                }
-                            >
-                                <option value="LEVE">
-                                    Leve
-                                </option>
+                <option value="GRAVISSIMA">
+                  Gravíssima
+                </option>
+              </select>
+            </div>
 
-                                <option value="MEDIA">
-                                    Média
-                                </option>
+            <div className="form-group">
+              <label htmlFor="pontos">
+                Pontos
+              </label>
 
-                                <option value="GRAVE">
-                                    Grave
-                                </option>
+              <input
+                id="pontos"
+                type="number"
+                min="0"
+                value={pontos}
+                onChange={(event) =>
+                  setPontos(event.target.value)
+                }
+                placeholder="Ex.: 5"
+              />
+            </div>
 
-                                <option value="GRAVISSIMA">
-                                    Gravíssima
-                                </option>
-                            </select>
-                        </div>
+            <div className="form-group">
+              <label htmlFor="valor">
+                Valor da multa
+              </label>
 
-                        <div className="form-group">
-                            <label htmlFor="pontos">
-                                Pontos
-                            </label>
+              <input
+                id="valor"
+                type="number"
+                min="0"
+                step="0.01"
+                value={valor}
+                onChange={(event) =>
+                  setValor(event.target.value)
+                }
+                placeholder="Ex.: 195.23"
+              />
+            </div>
 
-                            <input
-                                id="pontos"
-                                type="number"
-                                min="0"
-                                value={pontos}
-                                onChange={(event) =>
-                                    setPontos(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Ex.: 5"
-                            />
-                        </div>
+            {mensagem && (
+              <div className="success-message">
+                {mensagem}
+              </div>
+            )}
 
-                        <div className="form-group">
-                            <label htmlFor="valor">
-                                Valor da multa
-                            </label>
+            {erro && (
+              <div className="error-message">
+                {erro}
+              </div>
+            )}
 
-                            <input
-                                id="valor"
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={valor}
-                                onChange={(event) =>
-                                    setValor(
-                                        event.target.value
-                                    )
-                                }
-                                placeholder="Ex.: 195.23"
-                            />
-                        </div>
+            <button
+              type="submit"
+              disabled={salvando}
+            >
+              {salvando
+                ? "Salvando..."
+                : editandoId !== null
+                  ? "Salvar alterações"
+                  : "Cadastrar tipo de infração"}
+            </button>
 
-                        {mensagem && (
-                            <div className="success-message">
-                                {mensagem}
-                            </div>
+            {editandoId !== null && (
+              <button
+                type="button"
+                className="cancel-button"
+                onClick={limparFormulario}
+                disabled={salvando}
+              >
+                Cancelar edição
+              </button>
+            )}
+          </form>
+        </section>
+
+        <section className="table-card">
+          <div className="table-header">
+            <h2>
+              Tipos de infração cadastrados
+            </h2>
+
+            <span>
+              {tipos.length} registro(s)
+            </span>
+          </div>
+
+          {carregando ? (
+            <p className="loading">
+              Carregando tipos de infração...
+            </p>
+          ) : tipos.length === 0 ? (
+            <p className="empty">
+              Nenhum tipo de infração cadastrado.
+            </p>
+          ) : (
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Descrição</th>
+                    <th>Gravidade</th>
+                    <th>Pontos</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {tipos.map((tipo) => (
+                    <tr key={tipo.id}>
+                      <td>{tipo.id}</td>
+
+                      <td>{tipo.codigo}</td>
+
+                      <td>{tipo.descricao}</td>
+
+                      <td>
+                        {formatarGravidade(
+                          tipo.gravidade
                         )}
+                      </td>
 
-                        {erro && (
-                            <div className="error-message">
-                                {erro}
-                            </div>
-                        )}
+                      <td>{tipo.pontos}</td>
 
+                      <td>
+                        {formatarValor(tipo.valor)}
+                      </td>
+
+                      <td>
                         <button
-                            type="submit"
-                            disabled={salvando}
+                          type="button"
+                          className="edit-button"
+                          onClick={() =>
+                            iniciarEdicao(tipo)
+                          }
                         >
-                            {salvando
-                                ? "Salvando..."
-                                : editandoId !== null
-                                    ? "Salvar alterações"
-                                    : "Cadastrar tipo de infração"}
+                          Editar
                         </button>
 
-                        {editandoId !== null && (
-                            <button
-                                type="button"
-                                className="cancel-button"
-                                onClick={limparFormulario}
-                            >
-                                Cancelar edição
-                            </button>
-                        )}
-                    </form>
-                </section>
-
-                <section className="table-card">
-                    <div className="table-header">
-                        <h2>
-                            Tipos de infração cadastrados
-                        </h2>
-
-                        <span>
-                            {tipos.length} registro(s)
-                        </span>
-                    </div>
-
-                    {carregando ? (
-                        <p className="loading">
-                            Carregando tipos de infração...
-                        </p>
-                    ) : tipos.length === 0 ? (
-                        <p className="empty">
-                            Nenhum tipo de infração cadastrado.
-                        </p>
-                    ) : (
-                        <div className="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Código</th>
-                                        <th>Descrição</th>
-                                        <th>Gravidade</th>
-                                        <th>Pontos</th>
-                                        <th>Valor</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {tipos.map((tipo) => (
-                                        <tr key={tipo.id}>
-                                            <td>
-                                                {tipo.id}
-                                            </td>
-
-                                            <td>
-                                                {tipo.codigo}
-                                            </td>
-
-                                            <td>
-                                                {tipo.descricao}
-                                            </td>
-
-                                            <td>
-                                                {tipo.gravidade}
-                                            </td>
-
-                                            <td>
-                                                {tipo.pontos}
-                                            </td>
-
-                                            <td>
-                                                R${" "}
-                                                {tipo.valor.toFixed(
-                                                    2
-                                                )}
-                                            </td>
-
-                                            <td>
-                                                <button
-                                                    type="button"
-                                                    className="edit-button"
-                                                    onClick={() =>
-                                                        iniciarEdicao(
-                                                            tipo
-                                                        )
-                                                    }
-                                                >
-                                                    Editar
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    className="delete-button"
-                                                    onClick={() =>
-                                                        handleExcluir(
-                                                            tipo.id
-                                                        )
-                                                    }
-                                                >
-                                                    Excluir
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </section>
+                        <button
+                          type="button"
+                          className="delete-button"
+                          onClick={() =>
+                            handleExcluir(tipo.id)
+                          }
+                        >
+                          Excluir
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-        </div>
-    );
+          )}
+        </section>
+      </div>
+    </div>
+  );
 }

@@ -12,10 +12,12 @@ import com.transito.sistema.repository.InfracaoRepository;
 import com.transito.sistema.repository.TipoInfracaoRepository;
 import com.transito.sistema.repository.VeiculoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class InfracaoService {
 
     private final InfracaoRepository infracaoRepository;
@@ -282,17 +284,19 @@ public class InfracaoService {
     }
 
     private void adicionarPontos(
-            Condutor condutor,
-            Integer pontos
-    ) {
+        Condutor condutor,
+        Integer pontos
+        ) {
 
         int pontuacaoAtual =
-                condutor.getPontuacaoCnh();
+                condutor.getPontuacaoCnh() != null
+                        ? condutor.getPontuacaoCnh()
+                        : 0;
 
         condutor.setPontuacaoCnh(
                 pontuacaoAtual + pontos
         );
-    }
+        }
 
     private void removerPontos(
             Condutor condutor,
@@ -300,7 +304,9 @@ public class InfracaoService {
     ) {
 
         int pontuacaoAtual =
-                condutor.getPontuacaoCnh();
+        condutor.getPontuacaoCnh() != null
+                ? condutor.getPontuacaoCnh()
+                : 0;
 
         int novaPontuacao =
                 pontuacaoAtual - pontos;
